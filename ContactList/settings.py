@@ -26,17 +26,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-0ur%f-225!iu@se723=owun*p75@(pdva##4w$i@4-z&(s-ryk')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key-change-this-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+# In production, Railway should have DEBUG=False set
+DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
 # Allow all hosts for now - Railway generates dynamic URLs
 # For production, set ALLOWED_HOSTS environment variable
 if os.getenv('ALLOWED_HOSTS'):
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+    ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS').split(',')]
 else:
-    ALLOWED_HOSTS = ['*'] if not DEBUG else ['localhost', '127.0.0.1']
+    ALLOWED_HOSTS = ['*']  # Allow all in production, Railway will validate
 
 
 # Application definition
@@ -91,6 +92,7 @@ if os.getenv('DATABASE_URL'):
             default=os.getenv("DATABASE_URL"),
             conn_max_age=600,
             conn_health_checks=True,
+            atomic_requests=False,
         )
     }
 else:
@@ -162,3 +164,33 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+
+# Logging Configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': os.getenv('LOG_LEVEL', 'INFO'),
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'propagate': True,
+        },
+    },
+}
