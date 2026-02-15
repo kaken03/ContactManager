@@ -139,7 +139,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# Only include static dirs if they exist to avoid deployment errors
+STATICFILES_DIRS = []
+_static_dir = os.path.join(BASE_DIR, 'static')
+if os.path.exists(_static_dir):
+    STATICFILES_DIRS.append(_static_dir)
 
 # WhiteNoise Configuration for static file serving
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -157,6 +162,7 @@ LOGOUT_REDIRECT_URL = 'login'
 # Security Settings for Production
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
