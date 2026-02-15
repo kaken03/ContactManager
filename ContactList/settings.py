@@ -31,7 +31,12 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-0ur%f-225!iu@se723=owun*p7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Allow all hosts for now - Railway generates dynamic URLs
+# For production, set ALLOWED_HOSTS environment variable
+if os.getenv('ALLOWED_HOSTS'):
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+else:
+    ALLOWED_HOSTS = ['*'] if not DEBUG else ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -153,7 +158,7 @@ LOGOUT_REDIRECT_URL = 'login'
 
 # Security Settings for Production
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # SECURE_SSL_REDIRECT = True  # Disabled for debugging
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
