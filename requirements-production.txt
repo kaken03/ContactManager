@@ -1,0 +1,8 @@
+# Production requirements for Railway deployment
+# Use this file for production deployments that require PostgreSQL
+
+Django==6.0.1
+gunicorn==23.0.0
+psycopg2-binary==2.9.9
+dj-database-url==2.1.0
+python-dotenv==1.0.0

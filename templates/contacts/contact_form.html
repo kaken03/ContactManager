@@ -1,0 +1,117 @@
+{% extends 'contacts/base.html' %}
+
+{% block title %}{{ title }} - Contact Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mb-4">
+    <div class="col-lg-8">
+        <h1 class="h2 mb-4">
+            <i class="fas fa-address-card"></i> {{ title }}
+        </h1>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Contact Information</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label">
+                            <i class="fas fa-user"></i> Full Name *
+                        </label>
+                        {{ form.name }}
+                        <small class="form-text text-muted">Required field</small>
+                        {% if form.name.errors %}
+                        <div class="alert alert-danger small mt-2">{{ form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">
+                                <i class="fas fa-phone"></i> Phone Number *
+                            </label>
+                            {{ form.phone }}
+                            <small class="form-text text-muted">E.g., +1 (555) 123-4567</small>
+                            {% if form.phone.errors %}
+                            <div class="alert alert-danger small mt-2">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                <i class="fas fa-envelope"></i> Email
+                            </label>
+                            {{ form.email }}
+                            <small class="form-text text-muted">Optional</small>
+                            {% if form.email.errors %}
+                            <div class="alert alert-danger small mt-2">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.address.id_for_label }}" class="form-label">
+                            <i class="fas fa-map-marker-alt"></i> Address
+                        </label>
+                        {{ form.address }}
+                        <small class="form-text text-muted">Optional</small>
+                        {% if form.address.errors %}
+                        <div class="alert alert-danger small mt-2">{{ form.address.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">
+                                <i class="fas fa-tag"></i> Category
+                            </label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                            <div class="alert alert-danger small mt-2">{{ form.category.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.is_favorite.id_for_label }}" class="form-label">
+                                <i class="fas fa-star"></i> Mark as Favorite
+                            </label>
+                            <div class="form-check">
+                                {{ form.is_favorite }}
+                                <label class="form-check-label" for="{{ form.is_favorite.id_for_label }}">
+                                    Add to favorites
+                                </label>
+                            </div>
+                            {% if form.is_favorite.errors %}
+                            <div class="alert alert-danger small mt-2">{{ form.is_favorite.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> {{ button_text }}
+                        </button>
+                        <a href="{% url 'contact_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #id_name, #id_phone, #id_email, #id_address, #id_category {
+        width: 100%;
+    }
+
+    .form-control, .form-select {
+        padding: 0.6rem 0.75rem;
+        font-size: 1rem;
+    }
+</style>
+{% endblock %}
