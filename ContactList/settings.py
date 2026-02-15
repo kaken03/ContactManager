@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 from dotenv import load_dotenv
 import dj_database_url
 
@@ -80,7 +81,16 @@ WSGI_APPLICATION = 'ContactList.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-if os.getenv('DATABASE_URL'):
+# During collectstatic, use SQLite to avoid database-dependent operations
+# This prevents psycopg2 import errors during Railway deployment
+if 'collectstatic' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+elif os.getenv('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
     }
