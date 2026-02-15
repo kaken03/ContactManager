@@ -32,12 +32,16 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key-change-this-in-pro
 # In production, Railway should have DEBUG=False set
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-# Allow all hosts for now - Railway generates dynamic URLs
-# For production, set ALLOWED_HOSTS environment variable
+# Configure ALLOWED_HOSTS for Railway and development
 if os.getenv('ALLOWED_HOSTS'):
+    # Use explicit list from environment variable
     ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS').split(',')]
+elif os.getenv('DATABASE_URL'):
+    # Production on Railway - accept Railway domains
+    ALLOWED_HOSTS = ['*.up.railway.app', 'localhost', '127.0.0.1']
 else:
-    ALLOWED_HOSTS = ['*']  # Allow all in production, Railway will validate
+    # Development - localhost only
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 
 
 # Application definition
