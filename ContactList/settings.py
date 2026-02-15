@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
-import sys
 from dotenv import load_dotenv
 import dj_database_url
 
@@ -49,7 +48,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -81,20 +79,17 @@ WSGI_APPLICATION = 'ContactList.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# During collectstatic, use SQLite to avoid database-dependent operations
-# This prevents psycopg2 import errors during Railway deployment
-if 'collectstatic' in sys.argv:
+if os.getenv('DATABASE_URL'):
+    # Production - use PostgreSQL with dj-database-url
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-elif os.getenv('DATABASE_URL'):
-    DATABASES = {
-        'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
+        'default': dj_database_url.config(
+            default=os.getenv("DATABASE_URL"),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
 else:
+    # Development - use SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -146,9 +141,6 @@ _static_dir = os.path.join(BASE_DIR, 'static')
 if os.path.exists(_static_dir):
     STATICFILES_DIRS.append(_static_dir)
 
-# WhiteNoise Configuration for static file serving
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
 
@@ -165,10 +157,3 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_SECURITY_POLICY = {
-        "default-src": ("'self'",),
-        "style-src": ("'self'", "cdn.jsdelivr.net", "'unsafe-inline'"),
-        "script-src": ("'self'", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"),
-        "font-src": ("'self'", "cdnjs.cloudflare.com"),
-    }
